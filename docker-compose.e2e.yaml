@@ -1,0 +1,9 @@
+services:
+  postgres-e2e:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: avito
+      POSTGRES_PASSWORD: avito
+      POSTGRES_DB: avito_kitchen_e2e
+    ports:
+      - "5433:5432"

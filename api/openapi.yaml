@@ -1,0 +1,13 @@
+openapi: 3.0.3
+info:
+  title: Авито.Кухня API
+  version: 0.1.0
+paths:
+  /health:
+    get:
+      summary: Проверка доступности сервиса и БД
+      responses:
+        "200":
+          description: сервис и БД доступны
+        "503":
+          description: БД недоступна

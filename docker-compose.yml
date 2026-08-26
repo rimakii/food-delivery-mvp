@@ -1,0 +1,56 @@
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-avito}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-avito}
+      POSTGRES_DB: ${POSTGRES_DB:-avito_kitchen}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-avito} -d ${POSTGRES_DB:-avito_kitchen}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  migrate:
+    image: migrate/migrate:v4.17.1
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./migrations:/migrations
+    command:
+      [
+        "-path", "/migrations",
+        "-database", "postgres://${POSTGRES_USER:-avito}:${POSTGRES_PASSWORD:-avito}@postgres:5432/${POSTGRES_DB:-avito_kitchen}?sslmode=disable",
+        "up",
+      ]
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      APP_PORT: "8080"
+      DATABASE_URL: postgres://${POSTGRES_USER:-avito}:${POSTGRES_PASSWORD:-avito}@postgres:5432/${POSTGRES_DB:-avito_kitchen}?sslmode=disable
+    ports:
+      - "${APP_PORT:-8080}:8080"
+
+  restaurant-service:
+    build:
+      context: ./restaurant-service
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:
