@@ -21,18 +21,18 @@ func (s OrderStatus) Valid() bool {
 }
 
 type Restaurant struct {
-	ID        int32
-	Name      string
-	CreatedAt time.Time
+	ID        int32     `db:"id"`
+	Name      string    `db:"name"`
+	CreatedAt time.Time `db:"created_at"`
 }
 
 type MenuItem struct {
-	ID           int32
-	RestaurantID int32
-	Name         string
-	PriceCents   int64
-	Stock        int
-	CreatedAt    time.Time
+	ID           int32     `db:"id"`
+	RestaurantID int32     `db:"restaurant_id"`
+	Name         string    `db:"name"`
+	PriceCents   int64     `db:"price_cents"`
+	Stock        int32     `db:"stock"`
+	CreatedAt    time.Time `db:"created_at"`
 }
 
 type Order struct {
