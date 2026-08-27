@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -30,10 +31,11 @@ func (r *OrderRepository) CreateOrder(ctx context.Context, restaurantID int32, i
 	defer func() { _ = tx.Rollback(ctx) }()
 
 	var orderID int64
+	var createdAt time.Time
 	err = tx.QueryRow(ctx,
-		`INSERT INTO orders (restaurant_id, status) VALUES ($1, $2) RETURNING id`,
+		`INSERT INTO orders (restaurant_id, status) VALUES ($1, $2) RETURNING id, created_at`,
 		restaurantID, domain.OrderStatusNew,
-	).Scan(&orderID)
+	).Scan(&orderID, &createdAt)
 	if err != nil {
 		return domain.Order{}, fmt.Errorf("postgres: insert order: %w", err)
 	}
@@ -43,6 +45,7 @@ func (r *OrderRepository) CreateOrder(ctx context.Context, restaurantID int32, i
 		RestaurantID: restaurantID,
 		Status:       domain.OrderStatusNew,
 		Items:        make([]domain.OrderItem, 0, len(items)),
+		CreatedAt:    createdAt,
 	}
 
 	for _, item := range items {
