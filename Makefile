@@ -1,4 +1,4 @@
-.PHONY: up down lint test migrate-up migrate-down
+.PHONY: up down lint lint-docker test migrate-up migrate-down
 
 up:
 	docker compose up --build
@@ -8,6 +8,9 @@ down:
 
 lint:
 	golangci-lint run ./...
+
+lint-docker:
+	docker run --rm -v "$(CURDIR):/app" -w /app golangci/golangci-lint:latest golangci-lint run ./...
 
 test:
 	go test ./...

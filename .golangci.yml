@@ -1,19 +1,34 @@
-run:
-  timeout: 5m
-
+version: "2"
 linters:
-  disable-all: true
+  default: none
   enable:
+    - bodyclose
+    - errcheck
     - govet
+    - noctx
+    - revive
     - staticcheck
     - unused
-    - errcheck
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - restaurant-service
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
     - gofmt
     - goimports
-    - revive
-    - bodyclose
-    - noctx
-
-issues:
-  exclude-dirs:
-    - restaurant-service
+  exclusions:
+    generated: lax
+    paths:
+      - restaurant-service
+      - third_party$
+      - builtin$
+      - examples$
