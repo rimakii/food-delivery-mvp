@@ -1,0 +1,24 @@
+@startuml cjm-restaurant
+title CJM: заведение на Авито.Кухня
+
+start
+
+partition "Управление меню (сотрудник заведения, вручную через API)" {
+  :Создать позицию меню (POST /restaurants/{id}/menu-items);
+  :Обновить название/цену (PUT .../menu-items/{itemId});
+  :Изменить остаток (PATCH .../menu-items/{itemId}/stock, delta);
+}
+
+partition "Обработка заказов (restaurant-service, автоматический поллинг раз в 5с)" {
+  :Опросить новые заказы (GET /restaurants/{id}/orders);
+  if (есть заказы со статусом new?) then (да)
+    :Подтвердить (PATCH /orders/{id}/status = confirmed);
+  else (нет)
+    :Ждать следующего цикла опроса;
+  endif
+}
+
+:При необходимости — отменить заказ вручную\n(PATCH /orders/{id}/status = cancelled);
+
+stop
+@enduml

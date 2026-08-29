@@ -1,0 +1,35 @@
+@startuml cjm-user
+title CJM: клиент Авито.Кухня
+
+start
+:Открыть список заведений (GET /restaurants);
+:Выбрать заведение;
+:Открыть меню (GET /restaurants/{id}/menu);
+
+repeat
+  :Добавить позицию в заказ;
+repeat while (добавить ещё?) is (да)
+->нет;
+
+:Оформить заказ (POST /orders);
+
+if (позиций в заказе 0?) then (да)
+  :400 — пустой заказ;
+  stop
+elseif (остатка не хватает хотя бы на 1 позицию?) then (да)
+  :409 — нет в наличии;
+  stop
+else (нет)
+  :Заказ создан, status = new;
+endif
+
+:Проверить статус заказа (GET /orders/{id});
+
+if (заведение подтвердило?) then (да)
+  :status = confirmed;
+else (отменило)
+  :status = cancelled;
+endif
+
+stop
+@enduml

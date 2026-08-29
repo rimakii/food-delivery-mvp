@@ -1,0 +1,17 @@
+@startuml c4-l2
+title C4 (Level 2): Авито.Кухня — контейнеры
+
+actor "Клиент\n--\nбез авторизации" as client
+actor "Сотрудник заведения\n--\nведёт меню и остатки; без авторизаци" as staff
+
+rectangle "Авито.Кухня" {
+  component "API-сервис (Go)\n--\nзаказы, меню, заведения" as api
+  component "restaurant-service (Go)\n--\nопрашивает и подтверждает заказы" as rs
+  database "PostgreSQL\n--\nrestaurants, menu_items, orders, order_items" as db
+}
+
+client --> api : HTTP/JSON\nзаведения, меню, заказы
+staff --> api : HTTP/JSON\nменю, остатки, статус заказа
+rs --> api : HTTP/JSON, поллинг раз в 5с\nзаказы -> confirmed
+api --> db : SQL (pgx)
+@enduml
