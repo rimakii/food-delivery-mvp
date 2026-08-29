@@ -11,9 +11,9 @@ security: []
 
 tags:
   - name: client
-    description: API для клиентской части (без авторизации)
+    description: API для клиентской части
   - name: restaurant
-    description: API для заведений (закрытый список, без авторизации)
+    description: API для заведений
   - name: system
 
 paths:
