@@ -25,7 +25,7 @@ CREATE TABLE orders (
 CREATE INDEX idx_orders_restaurant_id ON orders (restaurant_id);
 
 CREATE TABLE order_items (
-    id           SERIAL PRIMARY KEY,
+    id           BIGSERIAL PRIMARY KEY,
     order_id     BIGINT NOT NULL REFERENCES orders (id) ON DELETE CASCADE,
     menu_item_id INT NOT NULL REFERENCES menu_items (id),
     quantity     INTEGER NOT NULL CHECK (quantity > 0),
