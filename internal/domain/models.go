@@ -8,7 +8,6 @@ const (
 	OrderStatusNew       OrderStatus = "new"
 	OrderStatusConfirmed OrderStatus = "confirmed"
 	OrderStatusCancelled OrderStatus = "cancelled"
-	// промежуточные статусы (in_preparation, delivered)?
 )
 
 func (s OrderStatus) Valid() bool {

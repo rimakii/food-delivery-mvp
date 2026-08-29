@@ -51,6 +51,9 @@ services:
     restart: unless-stopped
     depends_on:
       - api
+    environment:
+      API_BASE_URL: http://api:8080
+      RESTAURANT_ID: "1"
 
 volumes:
   postgres_data:
