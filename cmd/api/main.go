@@ -12,6 +12,8 @@ import (
 	"avito-kitchen/internal/config"
 	"avito-kitchen/internal/handlers"
 	"avito-kitchen/internal/repository/postgres"
+	"avito-kitchen/internal/usecase/menu"
+	"avito-kitchen/internal/usecase/order"
 )
 
 func main() {
@@ -29,10 +31,26 @@ func main() {
 	}
 	defer pool.Close()
 
+	orderSvc := order.NewService(postgres.NewOrderRepository(pool))
+	menuSvc := menu.NewService(postgres.NewMenuRepository(pool))
+
+	ordersHandler := handlers.NewOrdersHandler(orderSvc)
+	menuHandler := handlers.NewMenuHandler(menuSvc)
+	restaurantsHandler := handlers.NewRestaurantsHandler(menuSvc)
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", handlers.NewHealthHandler(pool).ServeHTTP)
 
-	// слой заказов/меню и остальные хендлеры
+	mux.HandleFunc("GET /restaurants", restaurantsHandler.List)
+	mux.HandleFunc("GET /restaurants/{restaurantID}/menu", menuHandler.Get)
+	mux.HandleFunc("POST /restaurants/{restaurantID}/menu-items", menuHandler.Create)
+	mux.HandleFunc("PUT /restaurants/{restaurantID}/menu-items/{itemID}", menuHandler.Update)
+	mux.HandleFunc("PATCH /restaurants/{restaurantID}/menu-items/{itemID}/stock", menuHandler.AdjustStock)
+	mux.HandleFunc("GET /restaurants/{restaurantID}/orders", ordersHandler.ListByRestaurant)
+
+	mux.HandleFunc("POST /orders", ordersHandler.Create)
+	mux.HandleFunc("GET /orders/{orderID}", ordersHandler.Get)
+	mux.HandleFunc("PATCH /orders/{orderID}/status", ordersHandler.UpdateStatus)
 
 	srv := &http.Server{
 		Addr:              ":" + cfg.AppPort,
