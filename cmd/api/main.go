@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"avito-kitchen/api"
 	"avito-kitchen/internal/config"
 	"avito-kitchen/internal/handlers"
 	"avito-kitchen/internal/repository/postgres"
@@ -51,6 +52,9 @@ func main() {
 	mux.HandleFunc("POST /orders", ordersHandler.Create)
 	mux.HandleFunc("GET /orders/{orderID}", ordersHandler.Get)
 	mux.HandleFunc("PATCH /orders/{orderID}/status", ordersHandler.UpdateStatus)
+
+	mux.HandleFunc("GET /docs", handlers.NewDocsHandler())
+	mux.HandleFunc("GET /openapi.yaml", handlers.NewOpenAPIHandler(api.OpenAPISpec))
 
 	srv := &http.Server{
 		Addr:              ":" + cfg.AppPort,
