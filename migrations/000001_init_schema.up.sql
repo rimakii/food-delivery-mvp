@@ -8,7 +8,7 @@ CREATE TABLE menu_items (
     id            SERIAL PRIMARY KEY,
     restaurant_id INT NOT NULL REFERENCES restaurants (id) ON DELETE CASCADE,
     name          TEXT NOT NULL,
-    price_cents   INT NOT NULL CHECK (price_cents >= 0),
+    price_cents   BIGINT NOT NULL CHECK (price_cents >= 0),
     stock         INTEGER NOT NULL DEFAULT 0 CHECK (stock >= 0),
     created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -29,7 +29,7 @@ CREATE TABLE order_items (
     order_id     BIGINT NOT NULL REFERENCES orders (id) ON DELETE CASCADE,
     menu_item_id INT NOT NULL REFERENCES menu_items (id),
     quantity     INTEGER NOT NULL CHECK (quantity > 0),
-    price_cents  INT NOT NULL CHECK (price_cents >= 0)
+    price_cents  BIGINT NOT NULL CHECK (price_cents >= 0)
 );
 
 CREATE INDEX idx_order_items_order_id ON order_items (order_id);
