@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"avito-kitchen/internal/domain"
@@ -37,6 +38,10 @@ func (r *OrderRepository) CreateOrder(ctx context.Context, restaurantID int32, i
 		restaurantID, domain.OrderStatusNew,
 	).Scan(&orderID, &createdAt)
 	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == pgForeignKeyViolation {
+			return domain.Order{}, domain.ErrRestaurantNotFound
+		}
 		return domain.Order{}, fmt.Errorf("postgres: insert order: %w", err)
 	}
 
